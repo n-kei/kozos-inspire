@@ -24,6 +24,7 @@ static char top_document[] =
 "<p><a href=\"about.html\">KOZOSとは？</a>\n"
 "<p><a href=\"kozos.html\">KOZOSの現状</a>\n"
 "<p><a href=\"makeos.html\">組込みＯＳを作ってみませんか？</a>\n"
+"<p><a href=\"form.html\">Config</a>\n"
 "</center>\n"
 "</body>\n"
 "</html>\n";
@@ -148,6 +149,36 @@ static char unknown_document[] =
 "</body>\n"
 "</html>\n";
 
+static char form_document[] =
+  "<html>\n"
+  "<head>\n"
+  "<title>This is test form page</title>\n"
+  "</head>\n"
+  "<body>\n"
+  "<form method=\"post\" action=\"complete.html\">\n"
+  "<p>\n"
+  "name: <input type=\"text\" name=\"NAME\" />\n"
+  "<input type=\"submit\" value=\"transmit\" />\n"
+  "<input type=\"reset\" value=\"delete\" />\n"
+  "</p>\n"
+  "</form>\n"
+  "</body>\n"
+  "</html>\n";
+
+static char complete_document[] = 
+  "<html>\n"
+  "<head>\n"
+  "<title>Configure is complete</title>\n"
+  "</head>\n"
+  "<body>\n"
+  "<center>\n"
+  "Configure is success!!\n"
+  "</center>\n"
+  "<p><a href=\"index.html\">TOP</a>\n"
+  "</body>\n"
+  "</html>\n";
+
+
 static struct documents {
   char *counterp;
   char *filename;
@@ -157,8 +188,15 @@ static struct documents {
   { NULL, "/about.html", about_document },
   { NULL, "/kozos.html", kozos_document },
   { NULL, "/makeos.html", makeos_document },
+  { NULL, "/form.html",   form_document },
+  { NULL, "/complete.html",   complete_document },
   { NULL, NULL, unknown_document }
 };
+
+static struct cgi {
+  char *tag_name;
+  char *value;
+} cgi_data;
 
 static void send_accept()
 {
@@ -235,6 +273,7 @@ static int parse(int number, char *str)
   static char *length_p = NULL;
   char *filename, *p;
   struct documents *docs;
+  unsigned char *test_str; // for test
 
   if (strncmp(str, "GET", 3))
     return 0;
@@ -244,7 +283,6 @@ static int parse(int number, char *str)
   filename = p;
   p = strchr(p, ' ');
   *p = '\0';
-
   if (!strcmp(filename, "/"))
     filename = "/index.html";
 
@@ -271,6 +309,7 @@ static int parse(int number, char *str)
 int httpd_main(int argc, char *argv[])
 {
   char *p = NULL, *r;
+  unsigned char *test_str; //for display test
   char *buffer;
   int number = 0, ret;
   struct netbuf *buf;
@@ -297,15 +336,43 @@ int httpd_main(int argc, char *argv[])
       memcpy(p, buf->top, buf->size);
       p += buf->size;
       *p = '\0';
-
-      r = strchr(buffer, '\n');
-      if (r) {
+      
+      if(!strncmp(buffer, "GET", 3)) {
+	putns(buffer, 3);
+	r = strchr(buffer, '\n');
+	if (r) {
+	  *r = '\0';
+	  r++;
+	  ret = parse(number, buffer);
+	  memmove(buffer, r, p - r + 1);
+	  p -= (r - buffer);
+	  if (ret) send_close(number);
+	} 
+      } else if(!strncmp(buffer, "POST", 4)) {
+	int i;
+	
+	putns(buffer, 4);
+	r = strchr(buffer, '\n');
+	for(i = 0; i < 13; i++) {
+	  r = strchr(r, '\n');
+	  *r = '\0';
+	  r++;
+	}
+	cgi_data.tag_name = r;
+	r = strchr(r, '=');
 	*r = '\0';
 	r++;
+	cgi_data.value = r;
+	puts(cgi_data.tag_name);
+	puts(cgi_data.value);
+	send_close(number);
+	/*
 	ret = parse(number, buffer);
 	memmove(buffer, r, p - r + 1);
 	p -= (r - buffer);
-	if (ret) send_close(number);
+	
+	if(ret) send_close(number);
+	*/
       }
       break;
     }
@@ -315,3 +382,4 @@ int httpd_main(int argc, char *argv[])
 
   return 0;
 }
+

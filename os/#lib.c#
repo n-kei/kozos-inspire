@@ -101,7 +101,7 @@ char *strchr(char *s, int c)
   return NULL;
 }
 
-/* £±Ê¸»úÁ÷¿® */
+/* ï¼‘æ–‡å­—é€ä¿¡ */
 int putc(unsigned char c)
 {
   if (c == '\n')
@@ -109,16 +109,16 @@ int putc(unsigned char c)
   return serial_send_byte(SERIAL_DEFAULT_DEVICE, c);
 }
 
-/* £±Ê¸»ú¼õ¿® */
+/* ï¼‘æ–‡å­—å—ä¿¡ */
 unsigned char getc(void)
 {
   unsigned char c = serial_recv_byte(SERIAL_DEFAULT_DEVICE);
   c = (c == '\r') ? '\n' : c;
-  putc(c); /* ¥¨¥³¡¼¡¦¥Ğ¥Ã¥¯ */
+  putc(c); /* ã‚¨ã‚³ãƒ¼ãƒ»ãƒãƒƒã‚¯ */
   return c;
 }
 
-/* Ê¸»úÎóÁ÷¿® */
+/* æ–‡å­—åˆ—é€ä¿¡ */
 int puts(unsigned char *str)
 {
   while (*str != '\0')
@@ -136,15 +136,7 @@ int putns(unsigned char *str, int len)
   return(0);
 }
 
-int putps(unsigned char *str, char target_ch)
-{
-  while(*str != target_ch)
-    putc(*(str++));
-
-  return(0);
-}
-
-/* Ê¸»úÎó¼õ¿® */
+/* æ–‡å­—åˆ—å—ä¿¡ */
 int gets(unsigned char *buf)
 {
   int i = 0;
@@ -158,7 +150,7 @@ int gets(unsigned char *buf)
   return i - 1;
 }
 
-/* ¿ôÃÍ¤Î16¿ÊÉ½¼¨ */
+/* æ•°å€¤ã®16é€²è¡¨ç¤º */
 int putxval(unsigned long value, int column)
 {
   char buf[9];
