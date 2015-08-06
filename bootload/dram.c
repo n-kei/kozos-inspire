@@ -1,21 +1,9 @@
+
 #include "defines.h"
 #include "lib.h"
 #include "dram.h"
-
-#define H8_3069F_ABWCR  ((volatile uint8 *)0xfee020)
-#define H8_3069F_ASTCR  ((volatile uint8 *)0xfee021)
-#define H8_3069F_RTCOR  ((volatile uint8 *)0xfee02a)
-#define H8_3069F_RTMCSR ((volatile uint8 *)0xfee028)
-#define H8_3069F_DRCRB  ((volatile uint8 *)0xfee027)
-#define H8_3069F_DRCRA  ((volatile uint8 *)0xfee026)
-
-#define H8_3069F_P1DDR  ((volatile uint8 *)0xfee000)
-#define H8_3069F_P2DDR  ((volatile uint8 *)0xfee001)
-#define H8_3069F_P8DDR  ((volatile uint8 *)0xfee007)
-#define H8_3069F_PBDDR  ((volatile uint8 *)0xfee00a)
-
-#define H8_3069F_WCRH   ((volatile uint8 *)0xfee022)
-#define H8_3069F_WCRL   ((volatile uint8 *)0xfee023)
+#include "portconf.h"
+#include "spreg.h"
 
 typedef struct {
   union {
@@ -27,49 +15,7 @@ typedef struct {
 
 int dram_init()
 {
-  /*
-   * dram_check2()でチェックしたら，値をうまく保持できないビットが存在した
-   * ので，リフレッシュレートを上げたら解消された．(ウエイトを多めにしても
-   * 効果は無かった)
-   * とりあえず，リフレッシュレート高めの設定にしておく．
-   */
-
-  *H8_3069F_ABWCR  = 0xff;
-#if 0
-  *H8_3069F_RTCOR  = 0x07;
-#else
-  *H8_3069F_RTCOR  = 0x03; /* リフレッシュ周期を短めに設定 */
-#endif
-#if 1
-  *H8_3069F_RTMCSR = 0x37;
-#else
-  *H8_3069F_RTMCSR = 0x2f; /* リフレッシュ周波数UP */
-#endif
-#if 1
-  *H8_3069F_DRCRB  = 0x98;
-#else
-  *H8_3069F_DRCRB  = 0x9f; /* ウエイト挿入 */
-#endif
-  *H8_3069F_DRCRA  = 0x30;
-
-  *H8_3069F_P1DDR  = 0xff;
-  *H8_3069F_P2DDR  = 0x07;
-  *H8_3069F_P8DDR  = 0xe4;
-  /* *H8_3069F_PBDDR = ...; */
-
-  /* H8_3069F_WCRH = ...; */
-#if 1
-  *H8_3069F_WCRL = 0xcf;
-#else
-  *H8_3069F_WCRL = 0xff; /* ウエイト挿入 */
-#endif
-
-#if 1
-  *H8_3069F_ASTCR = 0xfb; /* 2ステートアクセス */
-#else
-  *H8_3069F_ASTCR = 0xff; /* 3ステートアクセス */
-#endif
-
+  spreg_dram_init();
   return 0;
 }
 

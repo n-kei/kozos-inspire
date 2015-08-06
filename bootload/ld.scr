@@ -38,19 +38,8 @@ SECTIONS
 		*(.strings)
 		*(.rodata)
 		*(.rodata.*)
-		. = ALIGN(4);
+                . = ALIGN(4);
 		_erodata = . ;
-	} > rom
-
-	.firmdata : {
-		_firmdata_start = . ;
-		/* firmdata.o(.data) */
-		*(.firmdata)
-		_efirmdata = . ;
-	} > rom
-
-	.romdata : {
-		_romdata_start = . ;
 	} > rom
 
 	.softvec : {

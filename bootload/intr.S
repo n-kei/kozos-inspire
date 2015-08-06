@@ -106,9 +106,9 @@ _intr_timintr:
 	mov.l	@er7+,er6
 	rte
 
-	.global	_intr_ethintr
-#	.type	_intr_ethintr,@function
-_intr_ethintr:
+	.global	_intr_ir_edge
+#	.type	_intr_ir_edge,@function
+_intr_ir_edge:
 	mov.l	er6,@-er7
 	mov.l	er5,@-er7
 	mov.l	er4,@-er7
@@ -119,7 +119,7 @@ _intr_ethintr:
 	mov.l	er7,er1
 	mov.l	#_intrstack,sp
 	mov.l	er1,@-er7
-	mov.w	#SOFTVEC_TYPE_ETHINTR,r0
+	mov.w	#SOFTVEC_TYPE_IR_EDGE,r0
 	jsr	@_interrupt
 	mov.l	@er7+,er1
 	mov.l	er1,er7
@@ -132,9 +132,9 @@ _intr_ethintr:
 	mov.l	@er7+,er6
 	rte
 
-	.global	_intr_bkpoint
-#	.type	_intr_bkpoint,@function
-_intr_bkpoint:
+	.global	_intr_ir_tovf
+#	.type	_intr_ir_tovf,@function
+_intr_ir_tovf:
 	mov.l	er6,@-er7
 	mov.l	er5,@-er7
 	mov.l	er4,@-er7
@@ -145,7 +145,33 @@ _intr_bkpoint:
 	mov.l	er7,er1
 	mov.l	#_intrstack,sp
 	mov.l	er1,@-er7
-	mov.w	#SOFTVEC_TYPE_BKPOINT,r0
+	mov.w	#SOFTVEC_TYPE_IR_TOVF,r0
+	jsr	@_interrupt
+	mov.l	@er7+,er1
+	mov.l	er1,er7
+	mov.l	@er7+,er0
+	mov.l	@er7+,er1
+	mov.l	@er7+,er2
+	mov.l	@er7+,er3
+	mov.l	@er7+,er4
+	mov.l	@er7+,er5
+	mov.l	@er7+,er6
+	rte
+
+	.global	_intr_re_tovf
+#	.type	_intr_re_tovf,@function
+_intr_re_tovf:
+	mov.l	er6,@-er7
+	mov.l	er5,@-er7
+	mov.l	er4,@-er7
+	mov.l	er3,@-er7
+	mov.l	er2,@-er7
+	mov.l	er1,@-er7
+	mov.l	er0,@-er7
+	mov.l	er7,er1
+	mov.l	#_intrstack,sp
+	mov.l	er1,@-er7
+	mov.w	#SOFTVEC_TYPE_RE_TOVF,r0
 	jsr	@_interrupt
 	mov.l	@er7+,er1
 	mov.l	er1,er7

@@ -12,6 +12,12 @@ static char header[] =
 "Content-Length: #####\r\n"
 "\r\n";
 
+static char header2[] = 
+"HTTP/1.0 200 OK\r\n"
+"Keep-Alive: timeout=15, max=100\r\n"
+"Connection: Keep-Alive\r\n"
+"\r\n";
+
 static char top_document[] =
 "<html>\n"
 "<head>\n"
@@ -267,6 +273,22 @@ static char *val2str(int value)
   return top;
 }
 
+static int connecting_alive(int number, char *str)
+{
+  static int count = 0;
+  static char *length_p = NULL;
+  char *filename, *p;
+  struct documents *docs;
+  unsigned char *test_str; // for test
+
+  if (strncmp(str, "POST", 4))
+    return 0;
+
+  send_string(number, header2);
+
+  return 1;
+}
+
 static int parse(int number, char *str)
 {
   static int count = 0;
@@ -354,6 +376,8 @@ int httpd_main(int argc, char *argv[])
 	putns(buffer, 4);
 	r = strchr(buffer, '\n');
 	for(i = 0; i < 13; i++) {
+	  putps(r, '\n');
+	  puts("\n");
 	  r = strchr(r, '\n');
 	  *r = '\0';
 	  r++;
@@ -365,14 +389,15 @@ int httpd_main(int argc, char *argv[])
 	cgi_data.value = r;
 	puts(cgi_data.tag_name);
 	puts(cgi_data.value);
-	send_close(number);
-	/*
-	ret = parse(number, buffer);
+	connecting_alive(number, buffer);
+	send_string(number, top_document);
+	
+	//	ret = parse(number, buffer);
+	
 	memmove(buffer, r, p - r + 1);
 	p -= (r - buffer);
+	send_close(number);
 	
-	if(ret) send_close(number);
-	*/
       }
       break;
     }

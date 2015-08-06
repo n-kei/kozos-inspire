@@ -19,7 +19,7 @@ static int xmodem_wait(void)
   long cnt = 0;
 
   while (!serial_is_recv_enable(SERIAL_DEFAULT_DEVICE)) {
-    if (++cnt >= 50000) {
+    if (++cnt >= 2000000) {
       cnt = 0;
       serial_send_byte(SERIAL_DEFAULT_DEVICE, XMODEM_NAK);
     }
